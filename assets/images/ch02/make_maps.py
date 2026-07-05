@@ -351,7 +351,159 @@ def fig_palk():
     plt.close()
     print("✓", p)
 
+# ===================== FIG 2.1B — Political Map (all states + UTs) =====================
+def fig_political_map():
+    """
+    India's political map: all 28 states + 8 UTs, labelled, in the same
+    Natural-Earth style as the other Chapter 2 maps.
+    """
+    fig, ax = plt.subplots(figsize=(12, 13), dpi=160)
+
+    # Surrounding context — greyed
+    other = countries[(~countries["ADMIN"].isin(NB_LAND)) & (countries["ADMIN"] != "India")]
+    other.plot(ax=ax, color="#f3f3f0", edgecolor="#d8d6cc", linewidth=0.3)
+    neighbours_land.plot(ax=ax, color="#f0e6cf", edgecolor="#bdbab0", linewidth=0.5)
+
+    # Classify: 28 states vs 8 UTs (post-2019)
+    UTS = {
+        "Delhi", "Chandigarh", "Puducherry",
+        "Andaman and Nicobar", "Lakshadweep", "Ladakh",
+        "Jammu and Kashmir",
+        "Dadra and Nagar Haveli and Daman and Diu",
+    }
+    states_gdf = india_states[~india_states["name"].isin(UTS)].copy()
+    uts_gdf = india_states[india_states["name"].isin(UTS)].copy()
+
+    STATE_FILL = "#cfe0fa"
+    STATE_EDGE = "#1a3d80"
+    UT_FILL = "#fbe2b8"
+    UT_EDGE = "#8a5a1c"
+
+    states_gdf.plot(ax=ax, color=STATE_FILL, edgecolor="white", linewidth=0.9)
+    uts_gdf.plot(ax=ax, color=UT_FILL, edgecolor="white", linewidth=0.9)
+
+    # Outer country outline for emphasis
+    india.plot(ax=ax, facecolor="none", edgecolor=STATE_EDGE, linewidth=1.6)
+
+    # Manual label positions — state centroids drift into odd spots for irregular shapes,
+    # so we override for small / oddly shaped states and every UT.
+    LABEL_POS = {
+        # (lon, lat, fontsize, is_ut, optional leader target)
+        "Jammu and Kashmir": (74.8, 33.6, 7.5, True, None),
+        "Ladakh": (78.0, 34.5, 7.5, True, None),
+        "Himachal Pradesh": (77.3, 32.0, 7.0, False, None),
+        "Punjab": (75.4, 31.0, 7.5, False, None),
+        "Haryana": (76.3, 29.4, 7.5, False, None),
+        "Uttarakhand": (79.3, 30.2, 7.0, False, None),
+        "Delhi": (77.1, 28.65, 6.8, True, (79.5, 27.8)),
+        "Chandigarh": (76.78, 30.73, 6.5, True, (74.0, 31.4)),
+        "Rajasthan": (74.2, 26.7, 9.0, False, None),
+        "Uttar Pradesh": (80.5, 27.0, 8.5, False, None),
+        "Bihar": (85.5, 25.7, 8.0, False, None),
+        "Sikkim": (88.5, 27.6, 6.5, False, None),
+        "Arunachal Pradesh": (94.5, 28.2, 7.5, False, None),
+        "Assam": (92.8, 26.4, 7.5, False, None),
+        "Nagaland": (94.5, 26.0, 6.8, False, None),
+        "Manipur": (94.0, 24.7, 6.8, False, None),
+        "Mizoram": (92.9, 23.4, 6.5, False, None),
+        "Tripura": (91.7, 23.7, 6.5, False, None),
+        "Meghalaya": (91.3, 25.5, 6.8, False, None),
+        "West Bengal": (87.5, 23.6, 7.5, False, None),
+        "Jharkhand": (85.8, 23.6, 7.5, False, None),
+        "Odisha": (84.5, 20.5, 8.0, False, None),
+        "Chhattisgarh": (82.0, 21.5, 7.8, False, None),
+        "Madhya Pradesh": (78.5, 23.5, 9.0, False, None),
+        "Gujarat": (71.5, 22.6, 8.5, False, None),
+        "Maharashtra": (75.5, 19.5, 9.0, False, None),
+        "Telangana": (79.0, 17.8, 7.8, False, None),
+        "Andhra Pradesh": (80.0, 15.7, 8.0, False, None),
+        "Karnataka": (76.2, 14.5, 8.5, False, None),
+        "Goa": (74.0, 15.4, 6.5, False, None),
+        "Kerala": (76.3, 10.5, 7.5, False, None),
+        "Tamil Nadu": (78.5, 11.2, 8.5, False, None),
+        "Puducherry": (79.85, 11.93, 6.5, True, (82.5, 12.5)),
+        "Andaman and Nicobar": (93.0, 10.5, 7.0, True, None),
+        "Lakshadweep": (72.5, 10.3, 6.8, True, (69.5, 9.5)),
+        "Dadra and Nagar Haveli and Daman and Diu": (72.85, 20.3, 6.0, True, (69.8, 20.6)),
+    }
+
+    for name, (lon, lat, fs, is_ut, leader) in LABEL_POS.items():
+        color = UT_EDGE if is_ut else STATE_EDGE
+        weight = 700 if is_ut else 600
+        # Wrap long UT names
+        disp = name
+        if name == "Andaman and Nicobar":
+            disp = "Andaman &\nNicobar"
+        elif name == "Dadra and Nagar Haveli and Daman and Diu":
+            disp = "DNH & DD"
+        elif name == "Jammu and Kashmir":
+            disp = "J & K"
+        elif name == "Arunachal Pradesh":
+            disp = "Arunachal\nPradesh"
+        elif name == "Himachal Pradesh":
+            disp = "Himachal\nPradesh"
+        elif name == "Madhya Pradesh":
+            disp = "Madhya\nPradesh"
+        elif name == "Uttar Pradesh":
+            disp = "Uttar\nPradesh"
+        elif name == "Andhra Pradesh":
+            disp = "Andhra\nPradesh"
+        elif name == "West Bengal":
+            disp = "West\nBengal"
+        elif name == "Tamil Nadu":
+            disp = "Tamil\nNadu"
+
+        if leader:
+            lx, ly = leader
+            ax.annotate(disp, xy=(lon, lat), xytext=(lx, ly),
+                        fontsize=fs, color=color, fontweight=weight,
+                        ha="center", va="center",
+                        bbox=dict(boxstyle="round,pad=0.25",
+                                  facecolor="white", edgecolor=color, linewidth=0.7,
+                                  alpha=0.95),
+                        arrowprops=dict(arrowstyle="-", color=color, lw=0.7))
+        else:
+            ax.text(lon, lat, disp, fontsize=fs, color=color,
+                    fontweight=weight, ha="center", va="center")
+
+    # Neighbour labels
+    label_pts = {
+        "PAKISTAN": (70.5, 30.0),
+        "CHINA": (88.0, 35.5),
+        "NEPAL": (84.0, 28.3),
+        "BHUTAN": (90.5, 27.5),
+        "BANGLADESH": (90.2, 23.6),
+        "MYANMAR": (95.5, 21.5),
+        "SRI LANKA": (80.7, 7.7),
+        "AFGHANISTAN": (67.5, 33.5),
+    }
+    for k, (lo, la) in label_pts.items():
+        ax.text(lo, la, k, fontsize=8, color="#6b6b66",
+                style="italic", fontweight=600, ha="center")
+
+    # Legend
+    legend_els = [
+        Patch(facecolor=STATE_FILL, edgecolor=STATE_EDGE, label="State (28)"),
+        Patch(facecolor=UT_FILL, edgecolor=UT_EDGE, label="Union Territory (8)"),
+    ]
+    ax.legend(handles=legend_els, loc="lower left", frameon=True,
+              facecolor="white", edgecolor="#cad4e2", fontsize=10)
+
+    style_ax(ax, extent=(66, 99, 5, 38))
+    # Title + subtitle placed manually so they don't collide on this tall figure
+    fig.suptitle("India · political map — 28 states + 8 union territories",
+                 fontsize=15, fontweight=800, color=ACCENT, x=0.02, y=0.985, ha="left")
+    fig.text(0.02, 0.960,
+             "Post-2019 boundaries: Ladakh (UT) split from J & K; DNH and DD merged. Source: Natural Earth 1:10m.",
+             fontsize=10, color="#56657a", style="italic", ha="left")
+    plt.subplots_adjust(top=0.94)
+    p = f"{OUT}/fig-political-map.png"
+    plt.savefig(p, dpi=200, bbox_inches="tight", facecolor=PLT_BG)
+    plt.close()
+    print("✓", p)
+
 if __name__ == "__main__":
+    fig_political_map()
     fig_extreme_points()
     fig_tropic_states()
     fig_standard_meridian()

@@ -398,16 +398,16 @@ def fig_political_map():
         "Delhi": (77.1, 28.65, 6.8, True, (79.5, 27.8)),
         "Chandigarh": (76.78, 30.73, 6.5, True, (74.0, 31.4)),
         "Rajasthan": (74.2, 26.7, 9.0, False, None),
-        "Uttar Pradesh": (80.5, 27.0, 8.5, False, None),
+        "Uttar Pradesh": (81.5, 27.2, 8.5, False, None),
         "Bihar": (85.5, 25.7, 8.0, False, None),
         "Sikkim": (88.5, 27.6, 6.5, False, None),
-        "Arunachal Pradesh": (94.5, 28.2, 7.5, False, None),
-        "Assam": (92.8, 26.4, 7.5, False, None),
-        "Nagaland": (94.5, 26.0, 6.8, False, None),
-        "Manipur": (94.0, 24.7, 6.8, False, None),
-        "Mizoram": (92.9, 23.4, 6.5, False, None),
-        "Tripura": (91.7, 23.7, 6.5, False, None),
-        "Meghalaya": (91.3, 25.5, 6.8, False, None),
+        "Arunachal Pradesh": (95.0, 28.6, 7.5, False, None),
+        "Assam": (93.0, 26.9, 7.5, False, None),
+        "Nagaland": (94.3, 26.15, 6.5, False, None),
+        "Manipur": (93.95, 24.55, 6.5, False, None),
+        "Mizoram": (92.75, 23.2, 6.2, False, None),
+        "Tripura": (91.60, 23.55, 6.2, False, None),
+        "Meghalaya": (91.20, 25.75, 6.5, False, None),
         "West Bengal": (87.5, 23.6, 7.5, False, None),
         "Jharkhand": (85.8, 23.6, 7.5, False, None),
         "Odisha": (84.5, 20.5, 8.0, False, None),
@@ -421,8 +421,8 @@ def fig_political_map():
         "Goa": (74.0, 15.4, 6.5, False, None),
         "Kerala": (76.3, 10.5, 7.5, False, None),
         "Tamil Nadu": (78.5, 11.2, 8.5, False, None),
-        "Puducherry": (79.85, 11.93, 6.5, True, (82.5, 12.5)),
-        "Andaman and Nicobar": (93.0, 10.5, 7.0, True, None),
+        "Puducherry": (79.85, 11.93, 6.5, True, (82.7, 13.4)),
+        "Andaman and Nicobar": (94.5, 10.5, 7.0, True, None),
         "Lakshadweep": (72.5, 10.3, 6.8, True, (69.5, 9.5)),
         "Dadra and Nagar Haveli and Daman and Diu": (72.85, 20.3, 6.0, True, (69.8, 20.6)),
     }
@@ -481,10 +481,62 @@ def fig_political_map():
         ax.text(lo, la, k, fontsize=8, color="#6b6b66",
                 style="italic", fontweight=600, ha="center")
 
+    # State + UT capitals (name, lon, lat, label_dx, label_dy)
+    # Coords per Survey of India / Census of India. Amaravati is Andhra Pradesh's
+    # designated capital (AP Reorganisation Act 2014). Chandigarh is skipped as
+    # a separate capital-marker because the UT is already labelled as such.
+    CAPITAL_COL = "#b8003c"
+    CAPITALS = [
+        # 28 state capitals
+        ("Amaravati",         80.52, 16.51,  0.5, -0.35),  # AP
+        ("Itanagar",          93.61, 27.10, -0.4, -0.55),  # Arunachal
+        ("Dispur",            91.79, 26.14, -0.5, -0.55),  # Assam
+        ("Patna",             85.14, 25.59, -0.1,  0.45),  # Bihar
+        ("Raipur",            81.63, 21.25,  0.5,  0.45),  # Chhattisgarh
+        ("Panaji",            73.83, 15.49, -1.0, -0.10),  # Goa
+        ("Gandhinagar",       72.68, 23.22, -1.2, -0.15),  # Gujarat
+        ("Shimla",            77.17, 31.10,  0.7,  0.10),  # HP
+        ("Ranchi",            85.31, 23.34, -0.05,-0.45),  # Jharkhand
+        ("Bengaluru",         77.59, 12.97, -0.6, -0.45),  # Karnataka
+        ("T'puram",           76.94,  8.52, -1.1,  0.05),  # Kerala (short form)
+        ("Bhopal",            77.41, 23.26, -0.8,  0.15),  # MP
+        ("Mumbai",            72.87, 19.08, -0.7, -0.35),  # Maharashtra
+        ("Imphal",            93.94, 24.82,  0.5,  0.10),  # Manipur
+        ("Shillong",          91.89, 25.58, -0.85, -0.05), # Meghalaya
+        ("Aizawl",            92.72, 23.73, -0.65,  0.05), # Mizoram
+        ("Kohima",            94.11, 25.67, -0.85,  0.05), # Nagaland
+        ("Bhubaneswar",       85.82, 20.30,  0.5, -0.30),  # Odisha
+        ("Jaipur",            75.79, 26.92, -0.85,  0.05), # Rajasthan
+        ("Gangtok",           88.61, 27.34,  0.6,  0.15),  # Sikkim
+        ("Chennai",           80.27, 13.08,  1.05, -0.30),  # Tamil Nadu
+        ("Hyderabad",         78.49, 17.39, -1.05, -0.05),  # Telangana
+        ("Agartala",          91.28, 23.83, -0.9, -0.30),  # Tripura
+        ("Lucknow",           80.95, 26.85,  0.05,-0.45),  # UP
+        ("Dehradun",          78.03, 30.32, -1.0, -0.10),  # Uttarakhand
+        ("Kolkata",           88.36, 22.57,  0.6, -0.20),  # WB
+        # UT capitals (Chandigarh skipped — the UT label itself is at Chandigarh)
+        ("New Delhi",         77.21, 28.61, -1.4,  0.20),  # Delhi UT
+        ("Srinagar",          74.80, 34.08, -0.9,  0.30),  # J & K (summer)
+        ("Leh",               77.58, 34.15,  0.6,  0.15),  # Ladakh
+        ("Puducherry",        79.83, 11.94,  0.7,  0.20),  # Puducherry (near TN coast)
+        ("Kavaratti",         72.64, 10.57,  0.6, -0.30),  # Lakshadweep
+        ("Port Blair",        92.72, 11.62, -1.05,  0.10),  # A & N
+        ("Daman",             72.83, 20.42, -0.7, -0.20),  # DNH & DD
+    ]
+    for name, lon, lat, dx, dy in CAPITALS:
+        ax.scatter([lon], [lat], marker="*", s=90, color=CAPITAL_COL,
+                   edgecolor="white", linewidth=0.6, zorder=6)
+        ax.text(lon + dx, lat + dy, name, fontsize=6.2, color=CAPITAL_COL,
+                fontweight=700, style="italic", ha="center", va="center", zorder=7,
+                bbox=dict(boxstyle="round,pad=0.12", facecolor="white",
+                          edgecolor="none", alpha=0.85))
+
     # Legend
     legend_els = [
         Patch(facecolor=STATE_FILL, edgecolor=STATE_EDGE, label="State (28)"),
         Patch(facecolor=UT_FILL, edgecolor=UT_EDGE, label="Union Territory (8)"),
+        Line2D([0], [0], marker="*", color="none", markerfacecolor=CAPITAL_COL,
+               markeredgecolor="white", markersize=12, label="Capital"),
     ]
     ax.legend(handles=legend_els, loc="lower left", frameon=True,
               facecolor="white", edgecolor="#cad4e2", fontsize=10)
